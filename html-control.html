@@ -1,0 +1,315 @@
+
+<html>
+<head>
+<title>Ajax Post Web Page Particle.io Photon </title>
+<style>
+	table {
+		border-collapse: collapse;
+	}
+	
+	.tablecontainer{
+		vertical-align: top;
+		padding: 10px;
+	}
+</style>
+<script type="text/javascript">
+    var loadingmessage = 'Processing...';
+    
+    function setAjax(){
+        var xmlHttp;
+        try{
+            xmlHttp=new XMLHttpRequest(); // Firefox, Opera 8.0+, Safari
+            return xmlHttp;
+        }
+        catch (e){
+            try{
+                xmlHttp=new ActiveXObject("Msxml2.XMLHTTP"); // Internet Explorer
+                return xmlHttp;
+            }
+        catch (e){
+            try{
+                xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+                return xmlHttp;
+            }
+        catch (e){
+            alert("Your browser does not support AJAX!");
+            return false;
+        }
+        }
+        }
+    }
+    
+    
+    function myAjax(f, url, myDivToChange) {
+        var poststr = getFormValues(f);
+        postData(url, poststr, myDivToChange);
+    }
+    
+    
+    function postData(url, parameters, myDivToChange2){
+        var xmlHttp = setAjax();
+        xmlHttp.onreadystatechange =  function(){
+            if(xmlHttp.readyState > 0 && xmlHttp.readyState < 4){
+                document.getElementById(myDivToChange2).innerHTML=loadingmessage;
+            }
+            if (xmlHttp.readyState == 4) {
+                var myJsonObject = JSON.parse(xmlHttp.responseText);
+                //document.getElementById(myDivToChange2).innerHTML=xmlHttp.responseText+' data sent was '+parameters;
+                document.getElementById(myDivToChange2).innerHTML= myJsonObject.return_value;
+            }
+        };
+        xmlHttp.open("POST", url, true);
+        xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xmlHttp.send(parameters);
+    }
+    
+    
+    function getFormValues(fobj){
+        var str = "";
+        var valueArr = null;
+        var val = "";
+        var cmd = "";
+        for(var i = 0;i < fobj.elements.length;i++){
+            switch(fobj.elements[i].type){
+                case "text":
+                    str += fobj.elements[i].name +"=" + escape(fobj.elements[i].value) + "&";
+                break;         
+                case "password":
+                    str += fobj.elements[i].name +"=" + escape(fobj.elements[i].value) + "&";
+                break;
+                case "textarea":
+                    str += fobj.elements[i].name +"=" + escape(fobj.elements[i].value) + "&";
+                break;
+                case "select-one":
+                    str += fobj.elements[i].name +"=" + fobj.elements[i].options[fobj.elements[i].selectedIndex].value + "&";
+                break;
+            }
+        }
+        str = str.substr(0,(str.length - 1));
+        return str;
+    }
+    
+    
+    function sendToSpark(myIn){
+        document.all.myParameter.value = myIn;
+        document.myForm.action = 'https://api.spark.io/v1/devices/' + document.all.myDeviceId.value + '/' + document.all.myFunctionName.value;
+        myAjax(document.all.myCoolForm, document.myForm.action, 'myDivId');
+    
+    }
+</script>
+</head>
+
+<body onload="{
+myStorage1 = localStorage.getItem('myStoredText1');
+if(myStorage1  != null) document.getElementById('myToken').value = myStorage1;
+myStorage2 = localStorage.getItem('myStoredText2');
+if(myStorage2  != null) document.getElementById('myDeviceId').value = myStorage2;
+}">
+
+<h2 align=center>Ethan's Web Page for Photon Control</h2>
+
+<form name="myForm" method="POST" id="myCoolForm" >
+<input id="myParameter" name="params" type=text  style="display:none"     size=50 placeholder="d7-send-high">
+<table id="Form" style="margin: 0 auto;">
+	<tr>
+		<td>Device ID:</td>
+		<td><input id="myDeviceId" name="myCoreID" type=password size=50 placeholder="78dd12345678123456"></td>
+	</tr>
+	<tr>
+		<td>Access Token:</td>
+		<td><input id="myToken" name="access_token" type=password size=50 placeholder="5622ce6bba702ef6bd3456d5ed26aaa4a28d7c9"></td>
+	</tr>
+	<tr>
+		<td>
+			<input type="button" value="Store ID & Token" onClick="{
+				localStorage.setItem('myStoredText1', document.all.myToken.value);
+				localStorage.setItem('myStoredText2', document.all.myDeviceId.value);
+				alert( document.all.myToken.value + ' ' + document.all.myDeviceId.value + ' \nHas been stored');
+			}">
+		</td>
+	</tr>
+</table>
+</form>
+
+<input id="myFunctionName" name="myFunction"  type=hidden size=50 value="my-main" > 
+
+
+<br><br>
+
+<table id="buttons">
+	<tr>
+		<td class="tablecontainer">
+			<table>
+				<tr>
+					<th colspan=2>Digital Write</th>
+				</tr>
+				<tr>
+					<td><input type="button" value="D0-send-1" onClick="sendToSpark('d0-dsend-1')"></td>
+					<td><input type="button" value="D0-send-0" onClick="sendToSpark('d0-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D1-send-1" onClick="sendToSpark('d1-dsend-1')"></td>
+					<td><input type="button" value="D1-send-0" onClick="sendToSpark('d1-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D2-send-1" onClick="sendToSpark('d2-dsend-1')"></td>
+					<td><input type="button" value="D2-send-0" onClick="sendToSpark('d2-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D3-send-1" onClick="sendToSpark('d3-dsend-1')"></td>
+					<td><input type="button" value="D3-send-0" onClick="sendToSpark('d3-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D4-send-1" onClick="sendToSpark('d4-dsend-1')"></td>
+					<td><input type="button" value="D4-send-0" onClick="sendToSpark('d4-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D5-send-1" onClick="sendToSpark('d5-dsend-1')"></td>
+					<td><input type="button" value="D5-send-0" onClick="sendToSpark('d5-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D6-send-1" onClick="sendToSpark('d6-dsend-1')"></td>
+					<td><input type="button" value="D6-send-0" onClick="sendToSpark('d6-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D7-send-1" onClick="sendToSpark('d7-dsend-1')"></td>
+					<td><input type="button" value="D7-send-0" onClick="sendToSpark('d7-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A0-send-1" onClick="sendToSpark('a0-dsend-1')"></td>
+					<td><input type="button" value="A0-send-0" onClick="sendToSpark('a0-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A1-send-1" onClick="sendToSpark('a1-dsend-1')"></td>
+					<td><input type="button" value="A1-send-0" onClick="sendToSpark('a1-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A2-send-1" onClick="sendToSpark('a2-dsend-1')"></td>
+					<td><input type="button" value="A2-send-0" onClick="sendToSpark('a2-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A3-send-1" onClick="sendToSpark('a3-dsend-1')"></td>
+					<td><input type="button" value="A3-send-0" onClick="sendToSpark('a3-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A4-send-1" onClick="sendToSpark('a4-dsend-1')"></td>
+					<td><input type="button" value="A4-send-0" onClick="sendToSpark('a4-dsend-0')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A5-send-1" onClick="sendToSpark('a5-dsend-1')"></td>
+					<td><input type="button" value="A5-send-0" onClick="sendToSpark('a5-dsend-0')"></td>
+				</tr>
+			</table>
+		</td>
+		<td class="tablecontainer">
+			<table>
+				<tr>
+					<th colspan=2>Analog Write</th>
+				</tr>
+				<tr>
+					<td>D0-send-<input type="number" min=0 max=255 id="0"><input type=button onClick="sendToSpark('d0-asend-'+document.getElementById('0').value)" value="Send"></td>
+				</tr>
+				<tr>
+					<td>D1-send-<input type="number" min=0 max=255 id="1"><input type=button onClick="sendToSpark('d1-asend-'+document.getElementById('1').value)" value="Send"></td>
+				</tr>
+				<tr>
+					<td>D2-send-<input type="number" min=0 max=255 id="2"><input type=button onClick="sendToSpark('d2-asend-'+document.getElementById('2').value)" value="Send"></td>
+				</tr>
+				<tr>
+					<td>D3-send-<input type="number" min=0 max=255 id="3"><input type=button onClick="sendToSpark('d3-asend-'+document.getElementById('3').value)" value="Send"></td>
+				</tr>
+				<tr>
+					<td>A4-send-<input type="number" min=0 max=255 id="4"><input type=button onClick="sendToSpark('a4-asend-'+document.getElementById('4').value)" value="Send"></td>
+				</tr>
+				<tr>
+					<td>A5-send-<input type="number" min=0 max=255 id="5"><input type=button onClick="sendToSpark('a5-asend-'+document.getElementById('5').value)" value="Send"></td>
+				</tr>
+				<tr>
+					<td>A5/D2 values are linked</td>
+				</tr>
+				<tr>
+					<td>A4/D3 values are linked</td>
+				</tr>
+			</table>
+		</td>
+		<td class="tablecontainer">
+			<table>
+				<tr>
+					<th colspan=2>Digital Read</th>
+				</tr>
+				<tr>
+					<td><input type="button" value="a0-read" onClick="sendToSpark('a0-dread')"></td>
+					<td><input type="button" value="d0-read" onClick="sendToSpark('d0-dread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a1-read" onClick="sendToSpark('a1-dread')"></td>
+					<td><input type="button" value="d1-read" onClick="sendToSpark('d1-dread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a2-read" onClick="sendToSpark('a2-dread')"></td>
+					<td><input type="button" value="d2-read" onClick="sendToSpark('d2-dread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a3-read" onClick="sendToSpark('a3-dread')"></td>
+					<td><input type="button" value="d3-read" onClick="sendToSpark('d3-dread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a4-read" onClick="sendToSpark('a4-dread')"></td>
+					<td><input type="button" value="d4-read" onClick="sendToSpark('d4-dread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a5-read" onClick="sendToSpark('a5-dread')"></td>
+					<td><input type="button" value="d5-read" onClick="sendToSpark('d5-dread')"></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><input type="button" value="d6-read" onClick="sendToSpark('d6-dread')"></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><input type="button" value="d7-read" onClick="sendToSpark('d7-dread')"></td>
+				</tr>
+			</table>
+		</td>
+        <td class="tablecontainer">
+			<table>
+				<tr>
+					<th colspan=2>Analog Read</th>
+				</tr>
+				<tr>
+					<td><input type="button" value="a0-read" onClick="sendToSpark('a0-aread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a1-read" onClick="sendToSpark('a1-aread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a2-read" onClick="sendToSpark('a2-aread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a3-read" onClick="sendToSpark('a3-aread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a4-read" onClick="sendToSpark('a4-aread')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a5-read" onClick="sendToSpark('a5-aread')"></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+<input type=button value="RESET" onClick="sendToSpark('reset')">
+
+
+<br><br>
+<div width="400" height="200" name="myDivName" id="myDivId"> output here </div><br>
+
+
+<input type=button id="myToVolts" value="Convert Sensor reading into Volts" onclick="{
+  var myTemp = parseFloat(getElementById('myDivId').innerHTML)
+  document.all.myCalc1.value = (myTemp * 3.3 / 4095).toFixed(2);
+}">
+: <input type=text id="myCalc1" value=0 size=5>Volts <br><br><br>
+</body>
+</html>
