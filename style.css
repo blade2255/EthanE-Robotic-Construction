@@ -1,0 +1,7 @@
+body{
+        background-image: url('gateway.jpg');
+        background-attachment: fixed;
+        color: darkgrey;
+        font-family: 'Open Sans', sans-serif;
+        text-align: center;
+    }
