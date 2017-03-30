@@ -1,0 +1,397 @@
+<html>
+<head>
+	<title>Particle Web Communication </title>
+	<!-- ********************* DO NOT MESS WITH THIS ADVANCED AJAX STUFF -->
+	<!-- ********************* Look at the bottom of the page for student area -->
+	<link rel="stylesheet" type="text/css" href="main.css"> 
+	<script type="text/javascript">
+		<!--
+		var loadingmessage = 'Processing...';
+		function setAjax(){
+		   var xmlHttp;
+		   try{
+		      xmlHttp=new XMLHttpRequest(); // Firefox, Opera 8.0+, Safari
+		      return xmlHttp;
+		   }
+		   catch (e){
+		      try{
+		         xmlHttp=new ActiveXObject("Msxml2.XMLHTTP"); // Internet Explorer
+		         return xmlHttp;
+		      }
+		      catch (e){
+		         try{
+		            xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+		            return xmlHttp;
+		         }
+		         catch (e){
+		            alert("Your browser does not support AJAX!");
+		            return false;
+		         }
+		     }
+		   }
+		}
+		function myAjax(f, url, myDivToChange) {
+		   var poststr = getFormValues(f);
+		    postData(url, poststr, myDivToChange);
+		}
+		function postData(url, parameters, myDivToChange2){
+		   var xmlHttp = setAjax();
+		   xmlHttp.onreadystatechange =  function(){
+		      if(xmlHttp.readyState > 0 && xmlHttp.readyState < 4){
+		          document.getElementById(myDivToChange2).innerHTML=loadingmessage;
+		      }
+		      if (xmlHttp.readyState == 4) {
+		             // this is where the magic occcurs
+		             
+		          var myJsonObject = JSON.parse(xmlHttp.responseText);
+		             
+		             
+		           //document.getElementById(myDivToChange2).innerHTML=xmlHttp.responseText+' data sent was '+parameters;
+		         
+		           document.getElementById(myDivToChange2).innerHTML= myJsonObject.return_value;
+		         
+		         
+		         
+		      }
+		   }
+		   xmlHttp.open("POST", url, true);
+		   xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		   xmlHttp.send(parameters);
+		}
+		function getFormValues(fobj){
+		   var str = "";
+		   var valueArr = null;
+		   var val = "";
+		   var cmd = "";
+		   for(var i = 0;i < fobj.elements.length;i++){
+		      switch(fobj.elements[i].type){
+		         case "text":
+		            str += fobj.elements[i].name +"=" + escape(fobj.elements[i].value) + "&";
+		            break;         
+		         case "password":
+		            str += fobj.elements[i].name +"=" + escape(fobj.elements[i].value) + "&";
+		            break;
+		         case "textarea":
+		            str += fobj.elements[i].name +"=" + escape(fobj.elements[i].value) + "&";
+		            break;
+		         case "select-one":
+		             str += fobj.elements[i].name +"=" + fobj.elements[i].options[fobj.elements[i].selectedIndex].value + "&";
+		             break;
+		     }
+		   }
+		   str = str.substr(0,(str.length - 1));
+		   return str;
+		}
+		function sendToParticle(myIn){
+		    document.all.myParameter.value = myIn
+		    document.myForm.action = 'https://api.spark.io/v1/devices/' + document.all.myDeviceId.value + '/' + document.all.myFunctionName.value
+		    myAjax(document.all.myCoolForm, document.myForm.action, 'myDivId')   
+		    
+		}
+		//-->
+	</script>
+</head>
+
+<body onload="{
+	myStorage1 = localStorage.getItem('myStoredText1')
+	if(myStorage1  != null){     
+		document.getElementById('myToken').value = myStorage1 
+	}   
+	myStorage2 = localStorage.getItem('myStoredText2')
+	if(myStorage2  != null){
+		document.getElementById('myDeviceId').value = myStorage2      
+	}
+}">
+
+<h2 align=center>Dakaro's Web Page for Photon Control</h2>
+
+<form name="myForm" method="POST" id="myCoolForm" >
+<input id="myParameter" name="params" type=text  style="display:none"     size=50 placeholder="d7-send-high">
+<input id="myFunctionName" name="myFunction"  type=hidden size=50 value="my-main" >
+<table id="Form" style="margin: 0 auto;">
+	<tr>
+		<td>Device ID:</td>
+		<td><input id="myDeviceId" name="myCoreID" type=password size=50 placeholder="78dd12345678123456"></td>
+	</tr>
+	<tr>
+		<td>Access Token:</td>
+		<td><input id="myToken" name="access_token" type=password size=50 placeholder="5622ce6bba702ef6bd3456d5ed26aaa4a28d7c9"></td>
+	</tr>
+	<tr>
+		<td>
+			<input type="button" value="Store ID & Token" onClick="{
+				localStorage.setItem('myStoredText1', document.all.myToken.value);
+				localStorage.setItem('myStoredText2', document.all.myDeviceId.value);
+				alert( document.all.myToken.value + ' ' + document.all.myDeviceId.value + ' \nHas been stored');
+			}">
+		</td>
+	</tr>
+</table>
+</form>
+
+
+<br><br>
+
+<input type="button" value="WHOAMI" onClick="{
+sendToParticle('WHOAMI(xx,1)')
+}"> 31=Raspberry PI, 6=Photon<br>  
+
+<input type="button" value="Activate Loop" onClick="{
+if (this.value == 'Activate Loop'){                                                 
+sendToParticle('loop(xx,1);') 
+this.value = 'Stop Looping'
+} else {
+sendToParticle('loop(xx,0);')  
+this.value = 'Activate Loop'
+}
+}"> Direct microprocessor looped control <br><br>
+
+
+<div width="400" height="200" name="myDivName" id="myDivId"> output here </div><hr>
+
+
+<!-- ********************* END OF: DO NOT MESS WITH THIS ADVANCED STUFF -->  
+<!-- ********************* You change the following buttons as needed -->
+
+<br><br>
+
+<table id="buttons">
+	<tr>
+		<td class="tablecontainer">
+			<table>
+				<tr>
+					<th colspan=2>Digital Write</th>
+				</tr>
+				<tr>
+					<td><input type="button" value="D0 HIGH" onClick="sendToParticle('digitalWrite(D0,HIGH);')"></td>
+					<td><input type="button" value="D0 LOW" onClick="sendToParticle('digitalWrite(D0,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D1 HIGH" onClick="sendToParticle('digitalWrite(D1,HIGH);')"></td>
+					<td><input type="button" value="D1 LOW" onClick="sendToParticle('digitalWrite(D1,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D2 HIGH" onClick="sendToParticle('digitalWrite(D2,HIGH);')"></td>
+					<td><input type="button" value="D2 LOW" onClick="sendToParticle('digitalWrite(D2,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D3 HIGH" onClick="sendToParticle('digitalWrite(D3,HIGH);')"></td>
+					<td><input type="button" value="D3 LOW" onClick="sendToParticle('digitalWrite(D3,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D4 HIGH" onClick="sendToParticle('digitalWrite(D4,HIGH);')"></td>
+					<td><input type="button" value="D4 LOW" onClick="sendToParticle('digitalWrite(D4,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D5 HIGH" onClick="sendToParticle('digitalWrite(D5,HIGH);')"></td>
+					<td><input type="button" value="D5 LOW" onClick="sendToParticle('digitalWrite(D5,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D6 HIGH" onClick="sendToParticle('digitalWrite(D6,HIGH);')"></td>
+					<td><input type="button" value="D6 LOW" onClick="sendToParticle('digitalWrite(D6,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="D7 HIGH" onClick="sendToParticle('digitalWrite(D7,HIGH);')"></td>
+					<td><input type="button" value="D7 LOW" onClick="sendToParticle('digitalWrite(D7,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A0 HIGH" onClick="sendToParticle('digitalWrite(A0,HIGH);')"></td>
+					<td><input type="button" value="A0 LOW" onClick="sendToParticle('digitalWrite(A0,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A1 HIGH" onClick="sendToParticle('digitalWrite(A1,HIGH);')"></td>
+					<td><input type="button" value="A1 LOW" onClick="sendToParticle('digitalWrite(A1,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A2 HIGH" onClick="sendToParticle('digitalWrite(A2,HIGH);')"></td>
+					<td><input type="button" value="A2 LOW" onClick="sendToParticle('digitalWrite(A2,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A3 HIGH" onClick="sendToParticle('digitalWrite(A3,HIGH);')"></td>
+					<td><input type="button" value="A3 LOW" onClick="sendToParticle('digitalWrite(A3,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A4 HIGH" onClick="sendToParticle('digitalWrite(A4,HIGH);')"></td>
+					<td><input type="button" value="A4 LOW" onClick="sendToParticle('digitalWrite(A4,LOW);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="A5 HIGH" onClick="sendToParticle('digitalWrite(A5,HIGH);')"></td>
+					<td><input type="button" value="A5 LOW" onClick="sendToParticle('digitalWrite(A5,LOW);')"></td>
+				</tr>
+			</table>
+		</td>
+		<td class="tablecontainer">
+			<table>
+				<tr>
+					<th colspan=2>Analog Write</th>
+				</tr>
+				<tr>
+					<td>D0-send-<input type="number" min=0 max=255 id="0"><input type=button onClick="sendToParticle('analogWrite(D0,'+document.getElementById('0').value+');')" value="Send"></td>
+				</tr>
+				<tr>
+					<td>D1-send-<input type="number" min=0 max=255 id="1"><input type=button onClick="sendToParticle('analogWrite(D1,'+document.getElementById('1').value+');')" value="Send"></td>
+				</tr>
+				<tr>
+					<td>D2-send-<input type="number" min=0 max=255 id="2"><input type=button onClick="sendToParticle('analogWrite(D2,'+document.getElementById('2').value+');')" value="Send"></td>
+				</tr>
+				<tr>
+					<td>D3-send-<input type="number" min=0 max=255 id="3"><input type=button onClick="sendToParticle('analogWrite(D3,'+document.getElementById('3').value+');')" value="Send"></td>
+				</tr>
+				<tr>
+					<td>A4-send-<input type="number" min=0 max=255 id="4"><input type=button onClick="sendToParticle('analogWrite(A4,'+document.getElementById('4').value+');')" value="Send"></td>
+				</tr>
+				<tr>
+					<td>A5-send-<input type="number" min=0 max=255 id="5"><input type=button onClick="sendToParticle('analogWrite(A5,'+document.getElementById('5').value+');')" value="Send"></td>
+				</tr>
+				<tr>
+					<td>A5/D2 values are linked</td>
+				</tr>
+				<tr>
+					<td>A4/D3 values are linked</td>
+				</tr>
+			</table>
+		</td>
+		<td class="tablecontainer">
+			<table>
+				<tr>
+					<th colspan=2>Digital Read</th>
+				</tr>
+				<tr>
+					<td><input type="button" value="a0-read" onClick="sendToParticle('digitalRead(A0);')"></td>
+					<td><input type="button" value="d0-read" onClick="sendToParticle('digitalRead(D0);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a1-read" onClick="sendToParticle('digitalRead(A1);')"></td>
+					<td><input type="button" value="d1-read" onClick="sendToParticle('digitalRead(D1);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a2-read" onClick="sendToParticle('digitalRead(A2);')"></td>
+					<td><input type="button" value="d2-read" onClick="sendToParticle('digitalRead(D2);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a3-read" onClick="sendToParticle('digitalRead(A3);')"></td>
+					<td><input type="button" value="d3-read" onClick="sendToParticle('digitalRead(D3);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a4-read" onClick="sendToParticle('digitalRead(A4);')"></td>
+					<td><input type="button" value="d4-read" onClick="sendToParticle('digitalRead(D4);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a5-read" onClick="sendToParticle('digitalRead(A5);')"></td>
+					<td><input type="button" value="d5-read" onClick="sendToParticle('digitalRead(D5);')"></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><input type="button" value="d6-read" onClick="sendToParticle('digitalRead(D6);')"></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><input type="button" value="d7-read" onClick="sendToParticle('digitalRead(D7);')"></td>
+				</tr>
+			</table>
+		</td>
+        <td class="tablecontainer">
+			<table>
+				<tr>
+					<th colspan=2>Analog Read</th>
+				</tr>
+				<tr>
+					<td><input type="button" value="a0-read" onClick="sendToParticle('analogRead(A0);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a1-read" onClick="sendToParticle('analogRead(A1);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a2-read" onClick="sendToParticle('analogRead(A2);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a3-read" onClick="sendToParticle('analogRead(A3);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a4-read" onClick="sendToParticle('analogRead(A4);')"></td>
+				</tr>
+				<tr>
+					<td><input type="button" value="a5-read" onClick="sendToParticle('analogRead(A5);')"></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+<input type=button value="RESET" onClick="//sendToSpark('reset')">
+
+
+
+<hr>
+<h3>Delete the following after finished testing</h3>
+<!-- ********************* Delete the following when happy with your page -->     
+
+<input id="mySpecialIn" type=text value="digitalWrite(D7,1);"  placeholder="digitalWrite(D7,1);">
+<input type="button" value="<--Submit" onClick="{
+sendToParticle(document.all.mySpecialIn.value)
+}"><br>
+
+
+If using a sensor edit the below code to set your values to a correct amount with units:<br>
+<input type=button id="myToVolts" value="Test conversion for Volts" onclick="{
+var myTemp = parseFloat(getElementById('myDivId').innerHTML)
+document.all.myCalc1.value = (myTemp * 3.3 / 4095).toFixed(2);   // edit this to test your data
+}">
+: <input type=text id="myCalc1" value=0 size=5>Volts
+
+<br>
+<hr>
+<h2 align=center>On the Photon</h2>
+
+<img  width="900" src="http://rocksetta.com/spark-core-photon/photon-pins.png"><br><br>
+<br>   
+Note: Analog sensors A0-A7 read from 0-4095<br><br>   
+Note: PWM from 0 to 255 and works on the following 7 pins<br>
+D0, D1, (A4 or D2), (A5 or D3), WKP=A7, RX, TX<br>
+
+Serial - I2C<br> 
+D0 = SDA<br>
+D1 = SCL<br> <br>
+
+
+Serial - SPI <br>
+A5  = MOSI <br>
+A4  = MISO <br>
+A3  = SCLK <br> <br>
+
+Serial - UART <br> 
+TX  = Serial Pin 1 <br>
+RX  = Serial Pin 2 <br>  <br>  <br>     
+
+
+<h2 align=center>For the Raspberry PI</h2>
+GPIO pins at:  2-27 Some are preset pull-up.<br>
+Note: PWM! only at GPIO pins:  13, 16,  18,  19  <br><br>
+
+Note: The Raspberry PI does not have analogRead ability, so I have tricked the PI into thinking A0-A7 are Analog Reads by assuming a 
+capacitor is being used and a very fast loop is counting the number of loops until the capacitor is charged. <br>
+The circuit goes: 3V3 --> variable resistor --> (Branching to GPIO pin ) --> 0.10 uF Capacitor --> 100 ohm resistor --> GND <br>
+
+
+
+Serial - I2C<br> 
+GPIO 2 = SDA<br>
+GPIO 3 = SCL<br> <br>
+
+
+Serial - SPI <br>
+GPIO 10 = MOSI <br>
+GPIO 9  = MISO <br>
+GPIO 11 = SCLK <br> <br>
+
+Serial-UART <br> 
+GPIO 8  = TX <br>
+GPIO 10 = RX <br>  <br>  <br>   
+
+
+Note: I have only mentioned GPIO pin numbers and not physical pin numbers to make things less confusing. Lookup the Pin numbers<br><br>
+
+<img  width="500" src="http://rocksetta.com/spark-core-photon/gpio05.png"><br><br>
+<img  width="600" src="http://rocksetta.com/spark-core-photon/chart05.png"><br><br>
+</body>
+</html>
